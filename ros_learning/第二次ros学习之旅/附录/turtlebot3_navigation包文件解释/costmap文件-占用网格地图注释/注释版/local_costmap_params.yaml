@@ -1,0 +1,11 @@
+local_costmap:
+  global_frame: /odom											# 局部地图框架设置
+  robot_base_frame: /base_footprint				# 机器人底座框架设置
+  update_frequency: 2.0										# 更新周期Hz
+  publish_frequency: 0.5									# 发布周期Hz
+  static_map: false												# 是否使用给定地图
+  rolling_window: true										# 局部地图窗口设置
+  width: 3.5															# 局部地图窗口宽度m
+  height: 3.5															# 局部地图窗口高度m
+  resolution: 0.05												# 局部地图窗口分辨率，米/单元格
+  transform_tolerance: 1.0								# 允许的转换时间

@@ -1,0 +1,1 @@
+1、在ros里面如果想要更改工作空间的名称，可以试试在。bashcr的文件里面添加export ROS_PACKAGE_PATH=工作空间名:${ROS_PACKAGE_PATH},试一试

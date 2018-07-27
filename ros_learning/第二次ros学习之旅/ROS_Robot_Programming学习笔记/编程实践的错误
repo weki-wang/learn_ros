@@ -1,0 +1,10 @@
+在编写CMakeLists的时候，增加可执行文件时要加上三个部分：
+		add_executable(service_server src/service_server.cpp)   //增加可执行文件，名称和依赖的源文件
+		add_dependencies(service_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})//可执行文件所需要的依赖
+		target_link_libraries(service_server  ${catkin_LIBRARIES} ) //生成目标文件需要的链接库
+注意编程的时候的拼写错误，反复检查
+
+
+在ROS里面不论是否在同一个包里面，所有可运行节点的名称都要不一样，特别是CMakeLists.txt里面
+
+在树莓派里面运行rscore如果出现 permission denied的错误，表示没有权限，即需要使用root运行

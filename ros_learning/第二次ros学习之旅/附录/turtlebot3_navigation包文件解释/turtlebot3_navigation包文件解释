@@ -1,0 +1,16 @@
+turtlebot3_navigation.launch 一个文件可以启动与导航相关的所有功能包
+
+/launch/amcl.launch.xml   包含自适应蒙特卡罗定位（AMCL）的各种参数设置值文件
+
+/param文件夹下的文件-该文件夹均是一些设置参数，根据不同的情况需要更改
+		move_base_params.yaml    统筹管理运动规划的move_base的参数设置
+		costmap_common_params_xxx.yaml 导航使用的占用网格地图所需的配置参数，确定可移动和不可移动的区域，xxx表示车型
+		global_costmap_params.yaml 全局区域运动规划所需的文件
+		local_costmap_params.yaml  本地区域运动规划所需的文件
+		dwa_local_planner_params.yaml  将移动速度命令传给机器人的功能包的设置参数
+		base_local_planner_params.yaml trutlebot3未使用该文件，该文件已经整合到了dwa_local_planner_params.yaml里面去了
+		
+/maps/map.yaml  创建的占用网格地图保存在/maps目录
+
+/rviz/turtlebot3_nav.rviz 在rviz里面加载各种插件的显示参数
+	

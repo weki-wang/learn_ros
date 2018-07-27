@@ -1,0 +1,53 @@
+1、安装的具体过程参见ROS——Robot_Programming_CN的电子书和ROS Wiki官网
+
+2、学习的收获：
+
+rosdep 该命令是用来安装ROS核心组件的一些依赖包，它可以方便快捷的进行ROS核心组件相关的依赖包的安装
+catkin_init_workspace  用来初始化ROS的工作空间，使用该命令一般在/$自己的工作空间名/src 里面使用
+catkin_make 则是构建工作空间
+devel 该文件夹存放构建后的可执行文件
+build 存放构建系统的相关文件
+
+source 命令是将当前bash变量直接生效
+
+~  表示/home/weki   即主文件夹
+
+gedit ~/.bashrc   编辑包括ROS的配置、ROS网络、快捷命令等变量
+export | grep ROS 则是输出这个配置的变量信息
+在输入命令中记得使用tab进行补全功能
+
+RPC  远程过程调用，即利用远程控制其他计算机里面的程序
+
+二进制安装：使用sudo apt-get install *****
+源码安装：git **源码后，使用 catkin_make
+
+
+ROS里面C++编程风格   
+#CamelCased     每一个单词的首字母大写
+#camelCased     同CamelCased一样，只是首个单词的首字母小写
+#under_scored   全部小写
+#ALL_CAPITALS   全部大写
+
+Packages名称：under_scored  即全部小写，中间用下划线间隔开
+Topics/Services名称：同Packages
+Files名称：under_scored  并且源文件.c  头文件.h
+lib 名称：under_scored   例如libmy_great_thing #好 lib_my_great_thing #不好 不要在lib前缀后面加下划线
+Classes/Types 名称：CamelCased
+Function/Methods 名称：camelCased   其参数名是undder_scored
+Variables 名称：under_scored
+constants 名称：ALL_CAPITALS 全部大写
+Namespace 名称：under_scored
+
+功能包的构建：参见ROS_Robot_Programming 的第4.9章节
+注意：修改功能包的时候，需要修改package.xml和CMakeLists.txt这两个文件里面的功能包名称
+
+rosed 可以快速编辑某一个包里里面的文件，编辑器可以在～/.bashrc里面配置，如export EDITOR='gedit'
+
+rosclean check 检查log日志的大小
+rosclean purge 可以快速清除log日志，它清除位于/home/weki/.ros/log的日志
+
+rosservice call clear刷新屏幕
+
+注意：在ROS_Robot_Programming里面涉及到run_depend的内容需要换成exec_depend
+
+

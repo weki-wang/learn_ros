@@ -1,0 +1,43 @@
+<xacro:macro name="blue_shape" params="name *shape">	//xacro的代码聚集块定义：名称为blue_shape,该代码块有两个参数，第一个是name的参数，第二个是一个名称为shape的代码块（用*来修饰代码块）
+    <link name="${name}">				//在该marco的序列下，使用到name的参数
+        <visual>
+            <geometry>
+                <xacro:insert_block name="shape" />	//需要插入名称为shape的代码块，即那个圆柱体的								参数
+            </geometry>
+            <material name="blue"/>			//最开始定义的颜色属性
+        </visual>
+        <collision>
+            <geometry>
+                <xacro:insert_block name="shape" />
+            </geometry>
+        </collision>
+    </link>
+</xacro:macro>						//macro的参数结束
+
+<xacro:blue_shape name="base_link">
+    <cylinder radius=".42" length=".01" />
+</xacro:blue_shape>
+
+
+	
+
+//带有宏定义的xarco
+<xacro:property name="width" value="0.2" />		//定义参数width的含义为0.2
+<xacro:property name="bodylen" value="0.6" />
+<link name="base_link">
+    <visual>
+        <geometry>
+            <cylinder radius="${width}" length="${bodylen}"/>	//使用width的参数
+        </geometry>
+        <material name="blue"/>
+    </visual>
+    <collision>
+        <geometry>
+            <cylinder radius="${width}" length="${bodylen}"/>
+        </geometry>
+    </collision>
+</link>
+
+
+
+

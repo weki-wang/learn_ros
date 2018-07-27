@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<package format="2"> <!--以下均是包的内容-->
+  <name>my_first_ros_pkg</name>  
+  <version>0.0.1</version>
+  <!--包的简短描述-->
+  <description>The my_first_ros_pkg package</description>  
+  <!--证书--> 
+  <license>Apache License2.0</license>
+  <!--功能包开发人员的姓名和电子邮件，可以有多个author标签-->
+  <author email="weki@todo.todo">weki</author> 
+  <author email="weki@todo.todo">weki</author>
+  <author email="weki@todo.todo">weki</author>
+  <!--功能包管理者的姓名和电子邮件-->
+  <maintainer email="weki@todo.todo">weki</maintainer>  
+  <!--功能包错误管理、储存库、网站的地址-->
+  <url type="website">http://wiki.ros.org/my_first_ros_pkg</url> 
+  <url type="repository">http://wiki.ros.org/my_first_ros_pkg.git</url> 
+  <url type="bugtracker">http://wiki.ros.org/my_first_ros_pkg/issues</url>
+  <!--功能包构建工具-->
+  <buildtool_depend>catkin</buildtool_depend>
+  <!--功能包构建的依赖功能包-->
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <!--这部分是增加消息时构建的时候需要添加的-->
+  <build_depend>message_generation</build_depend>
+
+  <!--功能包构建输出时的依赖功能包-->
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <!--功能包构运行时的依赖功能包-->
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <!--功能包测试时的依赖功能包-->
+  <test_depend>gtest</test_depend>
+
+  <export>
+    <!--该功能包是元功能包的时候使用，如 <export><matepackage/></export>格式表明元功能包-->
+  </export>
+</package>

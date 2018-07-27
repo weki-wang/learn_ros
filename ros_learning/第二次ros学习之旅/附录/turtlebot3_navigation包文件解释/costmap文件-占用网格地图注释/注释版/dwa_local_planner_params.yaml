@@ -1,0 +1,54 @@
+# dwa_local_planner 是一个最终将移动速度命令传给机器人的功能包
+
+DWAPlannerROS:
+
+# Robot Configuration Parameters
+  max_vel_x: 0.18					# x轴的最大速度 m/s
+  min_vel_x: -0.18				# x轴的最小速度 m/s
+
+  max_vel_y: 0.0					# y轴的速度 ， 仅适用于全向机器人，故在此省略
+  min_vel_y: 0.0
+
+  # The velocity when robot is moving in a straight line
+  max_trans_vel:  0.18		# 最大平移速度
+  min_trans_vel:  0.05		# 最小平移速度，当值为负数时也可以后退
+#  trans_stopped_vel: 0.01 # 平移停止速度
+
+  max_rot_vel: 1.8				# 最大旋转速度 rad/s
+  min_rot_vel: 0.7				# 最小旋转速度 rad/s
+#  rot_stopped_vel: 0.01  # 旋转停止速度
+
+  acc_lim_x: 2.0					# x轴加速度限制 m/s^2
+  acc_lim_theta: 2.0			# 角加速度限制  rad/s^2
+  acc_lim_y: 0.0
+
+# Goal Tolerance Parametes   # 目标地点的允许误差
+  yaw_goal_tolerance: 0.15	 # yaw 偏航角离目标地点允许的误差(rad)
+  xy_goal_tolerance: 0.05		 # x  y 离目标地点允许的距离误差 m
+
+# Forward Simulation Parameters    # 前向仿真(Forward Simulation)的参数
+  sim_time: 3.5       						 # 前向仿真轨迹时间
+  vx_samples: 20       						 # 在x轴速度空间中搜索的样本数
+  vy_samples: 0       						 # 在y轴速度空间中搜索的样本数
+  vtheta_samples: 40       				 # 在theta轴速度空间中搜索的样本数
+
+# Trajectory Scoring Parameters  	 # 轨迹评分参数(轨迹评估) 用于轨迹评估的成本函数的分数计算如下
+# cost = path_distance_bias*(distance to path from the endpoint of the trajectory in meters) 
+#  				+ goal_distance_bias*(distance to local goal from the endpoint of the trajectory in meters)
+#					+ occdist_scale*(maximum obstacle cost along the trajectory in obstacle cost(0-254) )
+ 
+  path_distance_bias: 32.0				 # 衡量控制器遵循给定路径的一致程度的加权值
+  goal_distance_bias: 24.0				 # 判断是否接近目标地点的控制速度的加权值
+  occdist_scale: 0.04							 # 有关避障的加权值
+  forward_point_distance: 0.325		 # 机器人中心与附加得分点之间的距离m
+  stop_time_buffer: 0.2						 # 机器人在膨胀之前为了停止所需的最小时间s
+  scaling_speed: 0.25
+  max_scaling_factor: 0.2
+
+# Oscillation Prevention Parameters   # 防止震荡动作的参数
+  oscillation_reset_dist: 0.05				# 震荡标志复位之前机器人所需移动的距离
+
+# Debugging                           # 调试参数
+  publish_traj_pc : true							# 移动轨迹调试设置
+  publish_cost_grid_pc: true					# cotmap调试设置
+ # global_frame_id: odom							# 全局框架ID设置

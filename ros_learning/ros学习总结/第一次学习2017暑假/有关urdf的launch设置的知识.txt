@@ -1,0 +1,104 @@
+﻿1.在模拟运行display的时候，我们要注意路径一定要在该程序包的目录下
+
+
+2.解释代码
+
+//在使用xacro时的代码
+
+
+<launch>
+
+  <arg name="model" default="$(find urdf_tutorial)/urdf/r2d2.xacro"/>	//第一个命令行的参数：（如roslaunch urdf_tutorial display.launch model:=urdf/06-flexible.urdf中的model:=urdf/06-flexible.urdf为参数）缺少定义时，会自动寻找											default参数中的目录（注意寻找代码的目录是想对于现在的目录下），并把它储存到参数中
+ 
+ <arg name="gui" default="true" />		//第二个参数：询问是否打开控制器的参数，true代表打开，false代表关闭
+ 
+ <arg name="rvizconfig" default="$(find urdf_tutorial)/rviz/urdf.rviz" />		//第三个参数
+
+  
+<param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />	//打开rviz时，读取机器人的描述代码的地一个参数，依旧是通过路径查找，注意$(find xacro)/xacro.py 这是xacro特有的（最好将command改为textfile）
+
+  <param name="use_gui" value="$(arg gui)"/>						//打开模拟器时，读取前面arg参数储存的true这个参数，这里是实际打开控制器的代码
+
+ 
+ <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />	//运行的三个节点，rviz来模拟，另外两个机器人和关节实施状况的发布器，这三个是必须的。
+ 
+ <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+ 
+ <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+
+</launch>
+
+
+
+
+//使用urdf的代码
+
+
+
+这个代码是打开控制器，并接受参数的代码，命令行的表示如下roslaunch urdf_tutorials display.launch model:=urdf/06-flexible.urdf （注意urdf/这个参数和你所处的位置有关，如果你在urdf文件夹下，就不需要他）
+
+<launch>
+
+ 
+ <arg name="model" default="$(find urdf_tutorials)/urdf/r2d2.xacro"/>
+ 
+ <arg name="gui" default="true" />
+  <arg name="rvizconfig" default="$(find urdf_tutorials)/rviz/urdf.rviz" />
+
+ 
+ <param name="robot_description" textfile="$(arg model)" />
+ 
+ <param name="use_gui" value="$(arg gui)"/>
+
+ 
+ <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+ 
+ <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+ 
+ <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+
+</launch >
+
+
+
+
+这个代码是不需要控制器，并且带参数（文件的名称，urdf的名称，并且文件名称是必须的）
+  
+  <launch>  
+    
+    <arg name="model" />  
+     在model的后面加上需要打开的urdf的文件
+    <arg name="gui" default="False" />  
+  
+      <param name="robot_description" textfile="$(arg model)" />  
+   
+     <param name="use_gui" value="$(arg gui)"/>  
+  
+      <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />  
+  
+      <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
+  
+      <node name="rviz" pkg="rviz" type="rviz" args="-d $(find urdf_tutorial)/urdf.rviz" required="true" />  
+  
+  </launch>  
+
+
+
+
+
+<launch>
+<arg name="model" default="$(find urdf_sim_tutorial)/urdf/09-publishjoints.urdf.xacro"/>	//命名model的参数，其内容是寻找xarco的文件
+<arg name="rvizconfig" default="$(find urdf_tutorial)/rviz/urdf.rviz" />			//rvize的寻找文件的参数，用于寻找rvize的参数
+<include file="$(find urdf_sim_tutorial)/launch/gazebo.launch">					//包含打开gzebo.launch 的代码
+<arg name="model" value="$(arg model)" />
+</include>
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" />				//打开rvize的代码，并使用相关的参数，来准确找到
+<rosparam command="load"									//ros参数的读取命令，用文件里面读取默认的初始化参数，里面包含着joint控制器发布消息的类型和发布速率
+file="$(find urdf_sim_tutorial)/config/joints.yaml"
+ns="r2d2_joint_state_controller" />	//在命名空间中启动节点r2d2_joint_state_controller
+<node name="r2d2_controller_spawner" pkg="controller_manager" type="spawner"
+args="r2d2_joint_state_controller
+--shutdown-timeout 3"/>
+</launch>

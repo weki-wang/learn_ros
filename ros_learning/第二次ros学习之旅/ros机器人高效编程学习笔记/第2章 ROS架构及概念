@@ -1,0 +1,9 @@
+创建工作空间
+
+	echo $ROS_PACKGE_PATH 查看ROS正在使用的工作空间
+	mkdir -p ~/dev/catkin_ws/src  -p 表示-parents ，即递归创建文件夹，～表示/home/weki(用户名)
+	cd ~/dev/catkin_Ws/src
+	catkin_init_workspace   初始化工作空间，此时没有功能包，我们需要编译下工作空间
+	cd ~/dev/catkin_ws
+	catkin_make   在编译完成后，我们需要重新加载setup.bash，即source下，或者在～/.bashrc里面加上source /opt/ros/kinetic/setup.bash
+	注：重新创建一个工作空间并不会干扰其他工作空间，编译过程不会相互干扰，进入各自的工作空间catkin_make即可，(需要解决的是查看不同工作空间的node是否能通讯？)

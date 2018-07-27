@@ -1,0 +1,33 @@
+北京理工更新源
+deb http://mirror.bit.edu.cn/ubuntu/ trusty main restricted universe multiverse
+deb http://mirror.bit.edu.cn/ubuntu/ trusty-security main restricted universe multiverse
+deb http://mirror.bit.edu.cn/ubuntu/ trusty-updates main restricted universe multiverse
+deb http://mirror.bit.edu.cn/ubuntu/ trusty-backports main restricted universe multiverse
+deb http://mirror.bit.edu.cn/ubuntu/ trusty-proposed main restricted universe multiverse
+deb-src http://mirror.bit.edu.cn/ubuntu/ trusty main restricted universe multiverse
+deb-src http://mirror.bit.edu.cn/ubuntu/ trusty-security main restricted universe multiverse
+deb-src http://mirror.bit.edu.cn/ubuntu/ trusty-updates main restricted universe multiverse
+deb-src http://mirror.bit.edu.cn/ubuntu/ trusty-backports main restricted universe multiverse
+deb-src http://mirror.bit.edu.cn/ubuntu/ trusty-proposed main restricted universe multiverse
+
+http://wiki.ros.org/cn/jade/Installation/Ubuntu 	 ros官网的安装教程链接
+
+ros安装第一步：向更新源里面添加必备的软件更新链接
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+第二步：key码
+sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
+第三步：软件更新
+sudo apt-get update
+第四步：ros软件下载
+sudo apt-get install ros-indigo-desktop-full
+第五步：查看可用软件包
+apt-cache search ros-indigo
+第六步：初始化rosdep
+sudo rosdep init
+rosdep update
+第七步：配置环境，让ubuntu知道ros的位置
+echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
+
+source ~/.bashrc
+第八步：安装rosinstall
+sudo apt-get install python-rosinstall

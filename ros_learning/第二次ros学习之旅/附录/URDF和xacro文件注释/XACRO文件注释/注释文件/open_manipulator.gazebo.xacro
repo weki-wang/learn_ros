@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<!-- gazebo主要是添加各个连杆的一些动力参数，如重力、传感器等，为关节添加适当的阻尼动态和执行器控制插件，详细简介见http://gazebosim.org/tutorials/?tut=ros_urdf -->
+<robot>
+
+  <!-- World -->
+  <gazebo reference="world">
+  </gazebo>
+
+  <!-- Link1 -->
+  <gazebo reference="link1">
+    <kp>1000000.0</kp>    <!-- 接触刚度kp -->
+    <kd>100.0</kd>				<!-- 阻尼kd -->
+    <mu1>30.0</mu1>				<!-- 库仑摩擦系数，0表示无摩擦 -->
+    <mu2>30.0</mu2>				<!-- 摩擦方向2的可选库仑摩擦系数 -->
+    <maxVel>1.0</maxVel>  <!-- 最大接触校正速度截断项 -->
+    <minDepth>0.001</minDepth> <!-- 施加接触校正脉冲之前的最小允许深度 -->
+    <material>Gazebo/DarkGrey</material>   <!-- 材料颜色 -->
+  </gazebo>
+
+  <!-- Link2 -->
+  <gazebo reference="link2">
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <mu1>30.0</mu1>
+    <mu2>30.0</mu2>
+    <maxVel>1.0</maxVel>
+    <minDepth>0.001</minDepth>
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+  <!-- Link3 -->
+  <gazebo reference="link3">
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <mu1>30.0</mu1>
+    <mu2>30.0</mu2>
+    <maxVel>1.0</maxVel>
+    <minDepth>0.001</minDepth>
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+  <!-- Link4 -->
+  <gazebo reference="link4">
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <mu1>30.0</mu1>
+    <mu2>30.0</mu2>
+    <maxVel>1.0</maxVel>
+    <minDepth>0.001</minDepth>
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+  <!-- Link5 -->
+  <gazebo reference="link5">
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <mu1>30.0</mu1>
+    <mu2>30.0</mu2>
+    <maxVel>1.0</maxVel>
+    <minDepth>0.001</minDepth>
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+  <!-- grip_link -->
+  <gazebo reference="grip_link">
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <mu1>30.0</mu1>
+    <mu2>30.0</mu2>
+    <maxVel>1.0</maxVel>
+    <minDepth>0.001</minDepth>
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+  <!-- grip_link_sub -->
+  <gazebo reference="grip_link_sub">
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <mu1>30.0</mu1>
+    <mu2>30.0</mu2>
+    <maxVel>1.0</maxVel>
+    <minDepth>0.001</minDepth>
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+  <!-- ros_control plugin 在robot中添加插件，  --> 
+  <gazebo>  <!-- 未使用gazebo reference=""指定某一个连杆或者关节，则应用于整个robot， -->
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/open_manipulator</robotNamespace>   <!-- 设置在Gazebo中使用的机器人的名称 -->
+      <controlPeriod>0.001</controlPeriod>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>   <!-- 设置在Gazebo中机器人仿真界面的插件名称 -->
+    </plugin>
+  </gazebo>
+  
+  
+<!-- camera插件
+  <gazebo reference="camera_link">  将插件属性链接到camera_link连杆上
+    <sensor type="camera" name="camera1">
+      <update_rate>30.0</update_rate>  每小时在gazebo中拍摄图像的次数
+      
+      <camera name="head">			这些值以匹配制造商在物理相机硬件上的规格
+        <horizontal_fov>1.3962634</horizontal_fov>
+        <image>
+          <width>800</width>
+          <height>800</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>		
+      
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        
+        这里定义相机将要发布的图像topic和相机topic
+        <cameraName>rrbot/camera1</cameraName>  
+        <imageTopicName>image_raw</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+        
+        图像在tf树里发布的坐标系
+        <frameName>camera_link</frameName>
+        
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+      
+    </sensor>
+  </gazebo>
+
+-->  
+
+</robot>

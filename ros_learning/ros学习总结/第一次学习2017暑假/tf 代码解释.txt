@@ -1,0 +1,180 @@
+turtle_tf_broadcaster.cpp的解释
+
+#include <ros/ros.h>				//基本的ros头文件
+#include <tf/transform_broadcaster.h>		//广播tf的基本头文件，帮助tf发布更容易
+#include <turtlesim/Pose.h>			//位置信息的头文件
+
+std::string turtle_name;
+
+
+
+void poseCallback(const turtlesim::PoseConstPtr& msg){
+  static tf::TransformBroadcaster br;		//创建一个tf广播对象，随着时间发布消息
+  tf::Transform transform;
+  transform.setOrigin( tf::Vector3(msg->x, msg->y, 0.0) );		//设置原点
+  tf::Quaternion q;				//创建旋转坐标（三维的），使用笛卡尔坐标系
+  q.setRPY(0, 0, msg->theta);			//设定旋转的时候，x、y轴不旋转，z轴旋转（如小乌龟在转向的时候）
+  transform.setRotation(q);			//传递坐标
+  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", turtle_name));	//工作代码：前面设定好，然后send给transform，使用br将它广播出去，并加一												//个时间戳（当前时间），父标系的名字，子坐标系的名字
+}
+
+int main(int argc, char** argv){				//主函数
+  ros::init(argc, argv, "my_tf_broadcaster");			//初始化ros参数
+  if (argc != 2){ROS_ERROR("need turtle name as argument"); return -1;};	//检查命令行参数
+  turtle_name = argv[1];			//回调函数里面需要turtle_name的参数
+
+  ros::NodeHandle node;				//创建节点句柄
+  ros::Subscriber sub = node.subscribe(turtle_name+"/pose", 10, &poseCallback);		//创建一个订阅信息，缓存10条信息，订阅pose的信息，并返回信息给回调函数
+
+  ros::spin();
+  return 0;
+}
+
+
+
+tf中launch的解释
+
+  <launch>
+    <!-- Turtlesim Node-->		
+    <node pkg="turtlesim" type="turtlesim_node" name="sim"/>	//运行乌龟包里面的turtlesim_node的节点，改名为sim
+
+    <node pkg="turtlesim" type="turtle_teleop_key" name="teleop" output="screen"/>	//运行乌龟的键盘控制器，名字叫teleop，输出到屏幕上面
+    <!-- Axes -->			//坐标
+    <param name="scale_linear" value="2" type="double"/>		//参数：  线速度：2   类型：double
+    <param name="scale_angular" value="2" type="double"/>			角速度：2    类型：double
+
+    <node pkg="learning_tf" type="turtle_tf_broadcaster"		//运行我们创建的tf_broadcaster的包，给予命令行参数，节点重命名：turtle1_tf_broadcaster
+          args="/turtle1" name="turtle1_tf_broadcaster" />
+    <node pkg="learning_tf" type="turtle_tf_broadcaster"
+          args="/turtle2" name="turtle2_tf_broadcaster" />
+
+  </launch>
+
+
+
+tf中listener的代码解释
+
+#include <ros/ros.h>			//基本头文件
+#include <tf/transform_listener.h>	//tf头文件
+#include <geometry_msgs/Twist.h>	//广播和收听之间通信信息类型的头文件 
+#include <turtlesim/Spawn.h>		//乌龟再生的头文件
+
+int main(int argc, char** argv)		//主函数
+{
+  ros::init(argc, argv, "my_tf_listener");	//初始化
+
+  ros::NodeHandle node;			//节点句柄
+
+  ros::service::waitForService("spawn");	//声明服务，再生成一个乌龟
+  ros::ServiceClient add_turtle =		
+    node.serviceClient<turtlesim::Spawn>("spawn");
+  turtlesim::Spawn srv;
+  add_turtle.call(srv);
+
+  ros::Publisher turtle_vel =
+    node.advertise<geometry_msgs::Twist>("turtle2/cmd_vel", 10);
+
+  tf::TransformListener listener;		//创建tf的transformlistener，创建成功并命名
+
+  ros::Rate rate(10.0);		//检查速率：每秒10次
+  while (node.ok())		//
+ {
+    tf::StampedTransform transform;
+    try
+    {
+
+      listener.lookupTransform("/turtle2", "/turtle1",	//获取最新（代码time（0））的turtle2到turtle1的transform信息
+                               ros::Time(0), transform);
+     }
+    catch (tf::TransformException &ex) 	//使用抓捕包来捕获传输的异常
+    {
+      ROS_ERROR("%s",ex.what());
+      ros::Duration(1.0).sleep();
+      continue;
+    }
+
+    geometry_msgs::Twist vel_msg;	//获取两个乌龟之间的信息
+    vel_msg.angular.z = 4.0 * atan2(transform.getOrigin().y(),			//依据角度的数据计算它的角速度
+                                    transform.getOrigin().x());
+    vel_msg.linear.x = 0.5 * sqrt(pow(transform.getOrigin().x(), 2) +
+                                  pow(transform.getOrigin().y(), 2));		//依据直线距离算出他们的线速度
+    turtle_vel.publish(vel_msg);
+
+    rate.sleep();
+  }
+ return 0;
+}
+ 
+listener需要在launch里面添加的代码
+<launch>
+    ...
+    <node pkg="learning_tf" type="turtle_tf_listener"		//运行listener的节点，并将其命名为listener
+          name="listener" />
+ </launch>
+
+tf中增加固定坐标系有关代码解释
+
+frame的boradcaster增加的源代码解释
+
+#include <ros/ros.h>			//基本ros头文件
+#include <tf/transform_broadcaster.h>	//广播transform的头文件
+
+int main(int argc, char** argv){		
+  ros::init(argc, argv, "my_tf_broadcaster");	//初始化ros
+  ros::NodeHandle node;				//创建节点句柄
+
+  tf::TransformBroadcaster br;			//声明br类型
+  tf::Transform transform;
+
+  ros::Rate rate(10.0);				//检查速率
+  while (node.ok()){				//一旦节点开始运行
+    transform.setOrigin( tf::Vector3(0.0, 2.0, 0.0) );		//建立新的节点相对的位置，在相对点的左侧2.0处
+    transform.setRotation( tf::Quaternion(0, 0, 0, 1) );	//坐标旋转（不做了解）
+    br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "turtle1", "carrot1"));	//当transform从当前时间在tf中获取到了父系turtle1相对子系carrot1的位置时												//将其发送到br中，并广播出去
+    rate.sleep();
+  }
+  return 0;
+}
+
+
+包里面launch文件添加的代码解释
+
+  <launch>
+    ...
+    <node pkg="learning_tf" type="frame_tf_broadcaster"		//运行包里面的节点，并对其进行命名
+          name="broadcaster_frame" />
+  </launch>
+
+修改frame_broadcast的参数使其变成动态坐标：
+
+    transform.setOrigin( tf::Vector3(2.0*sin(ros::Time::now().toSec()), 2.0*cos(ros::Time::now().toSec()), 0.0) );	//以前是定值，现在让他改变成随着时间变化的坐标，toSec（）是将时间变成秒
+    transform.setRotation( tf::Quaternion(0, 0, 0, 1) );
+
+
+tf和time的关系代码解释（更改listener的cpp中间的参数）：
+
+try{
+    ros::Time now = ros::Time::now();			//重定义一个函数，读取现在的ros时间
+    listener.waitForTransform("/turtle2", "/turtle1",	//等待transform的转换信息，相对现在的时间，最多等待3s（否则就算等待超时）
+                              now, ros::Duration(3.0));
+    listener.lookupTransform("/turtle2", "/turtle1",		//在缓存里面查找现在的transform的参数（最新的）
+                             now, transform)
+tf的高级属性：时间旅行
+以下代码是错误的不能实现
+try{
+    ros::Time past = ros::Time::now() - ros::Duration(5.0);		//定义过去的时间
+    listener.waitForTransform("/turtle2", "/turtle1",			//等待缓存过去的时间（相对现在的5秒之前）
+                              past, ros::Duration(1.0));
+    listener.lookupTransform("/turtle2", "/turtle1",			//查找5秒前的信息
+                             past, transform);
+
+以下代码是正确的
+  try{
+    ros::Time now = ros::Time::now();				//定义现在的时间
+    ros::Time past = now - ros::Duration(5.0);			//定义过去的时间
+    listener.waitForTransform("/turtle2", now,			//等待并读取turtle2的transform信息处于现在
+                              "/turtle1", past,			//turtle1的坐标系处于过去
+                              "/world", ros::Duration(1.0));	//等待世界坐标，允许等待1秒
+    listener.lookupTransform("/turtle2", now,			//查找等待的信息，这样就可以找到turtle2的现在坐标和过去的
+                             "/turtle1", past,			//turtle1的过去坐标的差值
+                             "/world", transform);

@@ -1,0 +1,7 @@
+global_costmap:
+  global_frame: /map             					# 设置全局地图框架
+  robot_base_frame: /base_footprint				# 设置机器人底座框架
+  update_frequency: 2.0										# 更新周期Hz
+  publish_frequency: 0.1									# 发布周期Hz
+  static_map: true     										# 是否使用给定地图
+  transform_tolerance: 1.0								# 允许的tf转换时间s

@@ -1,0 +1,76 @@
+<launch>
+	<!-- 如果值为真，则amcl将接收地图话题，而不是服务调用 -->
+	<arg name="use_map_topic" default="false">  
+	<!-- 距离传感器检测的话题名称-->
+  <arg name="scan_topic"     default="scan"/>
+  <!-- 在初始位置估计中被用作高斯分布的初始x,y,theta的坐标值-->
+  <arg name="initial_pose_x" default="0.0"/>
+  <arg name="initial_pose_y" default="0.0"/>
+  <arg name="initial_pose_a" default="0.0"/>
+
+  <!-- 运行amcl节点-->
+  <node pkg="amcl" type="amcl" name="amcl">
+		<!-- 过滤器相关参数 -->
+		<!-- 允许最小粒子数量 -->
+    <param name="min_particles"             value="500"/>
+    <!-- 允许最大粒子数量，越大越好，根据pc的性能来设置-->
+    <param name="max_particles"             value="3000"/>
+    <!-- 实际分与估计分布之间的最大误差-->
+    <param name="kld_err"                   value="0.02"/>
+    <!-- 执行滤波器更新之前所需要的最小平移运动，单位m-->
+    <param name="update_min_d"              value="0.20"/>
+    <!-- 执行滤波器更新之前所需要的最小旋转运动，单位弧度-->
+    <param name="update_min_a"              value="0.20"/>
+    <!-- 重采样间隔时间，单位s -->
+    <param name="resample_interval"         value="1"/>
+    <!-- 允许的转换时间，单位s -->
+    <param name="transform_tolerance"       value="0.5"/>
+    <!-- 指数衰减率slow average weight filter,当值为0.0则禁用 -->
+    <param name="recovery_alpha_slow"       value="0.00"/>
+    <!-- 指数衰减率fast average weight filter,当值为0.0则禁止 -->
+    <param name="recovery_alpha_fast"       value="0.00"/>
+    <!-- 下面的参数详情见前面声明 -->
+    <param name="initial_pose_x"            value="$(arg initial_pose_x)"/>
+    <param name="initial_pose_y"            value="$(arg initial_pose_y)"/>
+    <param name="initial_pose_a"            value="$(arg initial_pose_a)"/>
+    <!-- 可视化扫描和路径信息的最大周期，单位HZ ，当值为-1.0则禁止 -->
+    <param name="gui_publish_rate"          value="50.0"/>
+		<!-- 更改传感器话题名称 -->
+    <remap from="scan"                      to="$(arg scan_topic)"/>
+    <!-- 设置激光传感器感应的最大距离，单位m -->
+    <param name="laser_max_range"           value="3.5"/>
+    <!-- 滤波器更新的时候使用的激光束数量的最大值 -->
+    <param name="laser_max_beams"           value="180"/>
+    <!-- 传感器的z_hit的混合加权值(mixture weight) -->
+    <param name="laser_z_hit"               value="0.5"/>
+    <!-- 传感器的z_short的混合加权值(mixture weight) --> 
+    <param name="laser_z_short"             value="0.05"/>
+    <param name="laser_z_max"               value="0.05"/>
+    <param name="laser_z_rand"              value="0.5"/>
+    <!-- 传感器的z_hit的高斯模型的标准偏差 -->
+    <param name="laser_sigma_hit"           value="0.2"/>
+    <!-- 传感器的z_short的指数衰减参数	-->
+    <param name="laser_lambda_short"        value="0.1"/>
+    <!-- 用于likelihood_field方式的传感器，与障碍物的最大距离，单位m -->
+    <param name="laser_likelihood_max_dist" value="2.0"/>
+    <!-- 选择传感器的类型 ，likelihoood_field类型或者beam类型 -->
+    <param name="laser_model_type"          value="likelihood_field"/>
+
+		<!-- 有关odometry有关的参数 -->
+		<!-- 机器人驱动方法选择，diff差速，omni麦克拉姆轮驱动 -->
+    <param name="odom_model_type"           value="diff"/>
+    <!-- 在旋转运动中预计的测位的旋转动量噪声的估计值 -->
+    <param name="odom_alpha1"               value="0.1"/>
+    <!-- 在平移运动中预计的测位的旋转动量噪声的估计值 -->
+    <param name="odom_alpha2"               value="0.1"/>
+    <!-- 在平移运动中预计的测位的平移动量噪声的估计值 -->
+    <param name="odom_alpha3"               value="0.1"/>
+    <!-- 在旋转运动中预计的测位的平移动量噪声的估计值 -->
+    <param name="odom_alpha4"               value="0.1"/>
+    <!-- odometry框架 -->
+    <param name="odom_frame_id"             value="odom"/>
+    <!-- 机器人底座（robot base）框架 -->
+    <param name="base_frame_id"             value="base_footprint"/>
+
+  </node>
+</launch>

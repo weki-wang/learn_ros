@@ -1,0 +1,20 @@
+查单词的词典：stardict    ：sudo apt-get install stardict
+然后下载一个stardict词库，使用root（su root）命令将词库复制到 /usr/share/stardict/dic里面
+$mv stardict-oxford-gb-2.4.2 /usr/share/stardict/dic
+
+
+多任务终端软件： 安装流程
+sudo add-apt-repository ppa:gnome-terminator
+sudo apt-get update
+sudo apt-get install terminator
+
+
+截图软件shutter：
+sudo apt-get install shutter
+
+一个有趣的插件：小猫跟着鼠标走  oneko
+
+
+pdf阅读器  
+okular软件，可以直接在ubuntu kylin软件中心下载
+

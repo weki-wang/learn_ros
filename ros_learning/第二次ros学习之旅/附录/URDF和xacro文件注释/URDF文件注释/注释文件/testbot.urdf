@@ -1,0 +1,130 @@
+<!-- urdf以robot标签开始，以link标签定义组件-连杆，以joint标签定义关节，以transmission标签设置关节和舵机之间的关系 等-->
+
+<?xml version="1.0" ?>
+<robot name="testbot">
+<material name="black">			<!-- material标签描述连杆的颜色和纹理，在这里定义好，后面可以直接调用material标签名称 -->
+	<color rgba="0.0 0.0 0.0 1.0"/> <!-- color定义颜色，rgb输入0.0-1.0之间，定义颜色，a表示透明度(alpha)值在0.0-1.0之间，1.0表示没有透明度 -->
+</material>
+<material name="orange">
+	<color rgba="1.0 0.4 0.0 1.0"/>
+</material>
+
+<link name="base"/>   			<!-- 以下是最基本的连杆和关节的描述格式，具体含义见下面解释 -->
+ 
+<joint name="fixed" type="fixed">
+	<parent link="base"/>
+	<child link="link1"/>
+</joint>
+	
+	
+<link name="link1">   								  <!-- link标签由碰撞(collision)、视觉(visual)、惯性(intertial)标签组成，也可以没有任何标签，直接以反斜杠结束 -->
+	<collision>															<!-- collision允许输入连杆的外形范围的几何信息，为防止碰撞一般它比视觉(visual)要大， -->
+		<origin xyz="0 0 0.25" rpy="0 0 0"/> 	<!-- origin表示几何中心的坐标(相对坐标系，上级关节的坐标系)，单位m，rpy表示航向角，单位rad， -->
+		<geometry>														<!-- 输入的模型形状，在collision里面指定为简单形态可以减少计算时间 -->
+			<box size="0.1 0.1 0.5"/>						<!-- 几何尺寸，urdf提供三种标准长方体box、圆柱形cylinder、球形sphere；也可以导入.dae  .stl格式的设计文件 -->
+		</geometry>
+	</collision>
+	
+	<visual>															<!-- 连杆的可视化信息，即实际尺寸，设置具体的大小、形状、外观 -->
+	<origin xyz="0 0 0.25" rpy="0 0 0"/>
+	<geometry>
+		<box size="0.1 0.1 0.5"/>
+	</geometry>
+	<material name="black"/>
+	</visual>
+	
+	<inertial>														<!-- 惯性标签，设置连杆质量，单位kg，惯性矩，单位kg.m^2;该标签用于动力学仿真 -->
+		<origin xyz="0 0 0.25" rpy="0 0 0"/>
+		<mass value="1"/>										<!-- 质量的设置，单位kg -->
+		<inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>   <!-- 惯性张量设置 -->
+	</inertial>
+</link>
+
+
+<joint name="joint1" type="revolute">   <!-- 关节标签，名称和类型，类型有：旋转运动型(revolute)、平移运动型(prismatic)、连续旋转的轮(continuous)、固定型(fixed)、非固定型(floating)、在与轴垂直的平面移动的形态(planar) -->
+	<parent link="link1"/>   							<!-- 连接的两个连杆的名称，父关节一般靠近基座 -->
+	<child link="link2"/>
+	<origin xyz="0 0 0.5" rpy="0 0 0"/> 	<!-- 将父连杆的坐标系转换为子连杆的坐标系 -->
+	<axis xyz="0 0 1"/>										<!-- 旋转和平移的基准轴 -->
+	<limit effort="30" lower="-2.617" upper="2.617" velocity="1.571"/>		<!-- 运动限制，设置关节速度，力的半径等，effort为关节力，单位N，最小lower、最大upper角度(单位rad)，速度velocity为rad/s -->
+</joint>
+
+
+
+<link name="link2">
+<collision>
+<origin xyz="0 0 0.25" rpy="0 0 0"/>
+<geometry>
+<box size="0.1 0.1 0.5"/>
+</geometry>
+</collision>
+<visual>
+<origin xyz="0 0 0.25" rpy="0 0 0"/>
+<geometry>
+<box size="0.1 0.1 0.5"/>
+</geometry>
+<material name="orange"/>
+</visual>
+<inertial>
+<origin xyz="0 0 0.25" rpy="0 0 0"/>
+<mass value="1"/>
+<inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+</inertial>
+</link>
+<joint name="joint2" type="revolute">
+<parent link="link2"/>
+<child link="link3"/>
+<origin xyz="0 0 0.5" rpy="0 0 0"/>
+<axis xyz="0 1 0"/>
+<limit effort="30" lower="-2.617" upper="2.617" velocity="1.571"/>
+</joint>
+<link name="link3">
+<collision>
+<origin xyz="0 0 0.5" rpy="0 0 0"/>
+<geometry>
+<box size="0.1 0.1 1"/>
+</geometry>
+</collision>
+<visual>
+<origin xyz="0 0 0.5" rpy="0 0 0"/>
+<geometry>
+<box size="0.1 0.1 1"/>
+</geometry>
+<material name="black"/>
+</visual>
+<inertial>
+<origin xyz="0 0 0.5" rpy="0 0 0"/>
+<mass value="1"/>
+<inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+</inertial>
+</link>
+<joint name="joint3" type="revolute">
+<parent link="link3"/>
+<child link="link4"/>
+<origin xyz="0 0 1.0" rpy="0 0 0"/>
+<axis xyz="0 1 0"/>
+<limit effort="30" lower="-2.617" upper="2.617" velocity="1.571"/>
+</joint>
+<link name="link4">
+<collision>
+<origin xyz="0 0 0.25" rpy="0 0 0"/>
+<geometry>
+<box size="0.1 0.1 0.5"/>
+</geometry>
+</collision>
+<visual>
+<origin xyz="0 0 0.25" rpy="0 0 0"/>
+<geometry>
+<box size="0.1 0.1 0.5"/>
+</geometry>
+<material name="orange"/>
+</visual>
+<inertial>
+<origin xyz="0 0 0.25" rpy="0 0 0"/>
+<mass value="1"/>
+<inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+</inertial>
+</link>
+</robot>
+
+

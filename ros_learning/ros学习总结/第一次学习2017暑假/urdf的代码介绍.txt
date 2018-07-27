@@ -1,0 +1,612 @@
+//最简单的urdf的代码简介
+
+<?xml version="1.0"?>	//urdf文件是xml，第一行一般来显示版本，但是不编译
+<robot name="myfirst">		//跟你创建的robot取名字，可自己随意定
+  <link name="base_link">	//一般机器人是由link（连接体）和 joint（连接点）组成的，一般第一个被称为base_link，后面的是依附在它的基础上
+    <visual>			//这面定义一个link包括外观，几何尺寸，颜色，材质，纹理，贴图等等参数
+      <geometry>		//这里定义link的几何结构
+        <cylinder length="0.6" radius="0.2"/>	//这里是几何结构的具体参数
+      </geometry>		//link的几何结构定义结束
+    </visual>			//link的一些参数定义结束
+  </link>			//这个link的定义结束
+</robot>			//机器人定义结束
+
+//增加link并且加入joint（有活动关节和飞活动关节）
+非活动关节代码
+<?xml version="1.0"?>		//版本
+<robot name="multipleshapes">	//机器人的取名
+  <link name="base_link">	//第一个link的名字（最基本的link块）
+    <visual>			//该link部分的虚拟参数
+      <geometry>		//几何参数
+        <cylinder length="0.6" radius="0.2"/>
+      </geometry>		//几何参数结束
+    </visual>			//虚拟参数结束
+  </link>			//该link参数结束
+
+  <link name="right_leg">	//第二个link名
+    <visual>			
+      <geometry>
+        <box size="0.6 0.1 0.2"/>	//几何参数为一个矩形块，参数依次为xyz。<sphere>代表球体
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="base_to_right_leg" type="fixed">		//link的连接代码，表示这个连接的类型是固定（fixed）的类型
+    <parent link="base_link"/>				//指定父系和子系
+    <child link="right_leg"/>
+  </joint>
+
+</robot>
+
+//进一步的加入关节的代码（注意在关节的连接处，最主要是的弄懂我们机器人link运动的原点，把开始生产的默认中心点移动到运动的原点，然后再将这个运动原定相对父系坐标位移到一定的位置，这样来构成整体的架构）
+
+<?xml version="1.0"?>
+<robot name="origins">
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.6" radius="0.2"/>	//默认的几何中心在世界坐标的原点中心
+      </geometry>
+    </visual>
+  </link>
+
+  <link name="right_leg">
+    <visual>
+      <geometry>
+        <box size="0.6 0.1 0.2"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 -0.3"/>	//r表示横滚角，p俯仰角，y偏行角（弧度），代码p转90度=3.1415926/2，调整link的中心坐标（中心在世界原点的z轴下方）
+    </visual>
+  </link>
+
+  <joint name="base_to_right_leg" type="fixed">
+    <parent link="base_link"/>
+    <child link="right_leg"/>
+    <origin xyz="0 -0.22 0.25"/>
+  </joint>
+
+</robot>
+
+//进一步加入材料，颜色，透明度等等
+<?xml version="1.0"?>
+<robot name="materials">
+
+  <material name="blue">	//为link增加颜色的宏定义，可以多次调用，来减少代码数，和方便维护
+    <color rgba="0 0 0.8 1"/>	//前三个是RGB值，最后一个是透明度，1是完全不透明，0是完全透明
+  </material>		//表示材料定义结束，但是不编译
+
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.6" radius="0.2"/>
+      </geometry>	
+      <material name="blue"/>	//几何参数定义结束了，就开始材料定义
+    </visual>
+  </link>
+
+  <link name="right_leg">
+    <visual>
+      <geometry>
+        <box size="0.6 0.1 0.2"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 -0.3"/>
+      <material name="white"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_right_leg" type="fixed">
+    <parent link="base_link"/>
+    <child link="right_leg"/>
+    <origin xyz="0 -0.22 0.25"/>
+  </joint>
+
+  <link name="left_leg">
+    <visual>
+      <geometry>
+        <box size="0.6 0.1 0.2"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 -0.3"/>
+      <material name="white"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_left_leg" type="fixed">
+    <parent link="base_link"/>
+    <child link="left_leg"/>
+    <origin xyz="0 0.22 0.25"/>
+  </joint>
+
+</robot>
+
+//定义活动的节点joint
+
+
+ <joint name="head_swivel" type="continuous">	//joint名称，类型为活动的
+    <parent link="base_link"/>
+    <child link="head"/>
+    <axis xyz="0 0 1"/>			//活动时构件（子系）的旋转中心的矢量，即绕着z轴旋转
+    <origin xyz="0 0 0.3"/>		//自己的运动中心距离父系的坐标值
+  </joint>
+
+//加入限制活动的节点，该活动节点比一般的活动块多了一些限制条件
+
+
+  <joint name="left_gripper_joint" type="revolute">	//链接处的名称和类型
+    <axis xyz="0 0 1"/>					//旋转的矢量（依照它的活动原点来说，活动原点在定义link的时候已经设置好）
+    <limit effort="1000.0" lower="0.0" upper="0.548" velocity="0.5"/>	//限制旋转的弧度，最低为，最高为0.548弧度，速度旋转速度最高为0.5 
+    <origin rpy="0 0 0" xyz="0.2 0.01 0"/>		//子link的活动原点相对于父系的坐标位置，并且表明是否旋转（航行角等知识点）
+    <parent link="gripper_pole"/>
+    <child link="left_gripper"/>
+  </joint>
+
+//活动块的运动时水平移动（以下代码含有移动限制）而不是旋转的代码
+
+<joint name="gripper_extension" type="prismatic">	//prismatic表示其类型为直线运动，它沿着一个轴线运动
+    <parent link="base_link"/>
+    <child link="gripper_pole"/>
+    <limit effort="1000.0" lower="-0.38" upper="0" velocity="0.5"/>	//依旧表示最小值和最大值和速度，但是他的单位是米，速度单位是m/s。
+    <origin rpy="0 0 0" xyz="0.19 0 0.2"/>		//定义连接点相对于父系的运动中心的矢量位置
+  </joint>
+
+//在机器人中间我们需要添加碰撞属性和物理属性（如惯性等）
+
+<link name="base_link">
+    <visual>			//物理的外观属性，如几何，纹理，贴图，颜色等
+      <geometry>		//几何属性
+        <cylinder length="0.6" radius="0.2"/>
+      </geometry>
+      <material name="blue">	//颜色属性、透明度
+        <color rgba="0 0 .8 1"/>
+      </material> 
+    </visual>
+    <collision>     		//碰撞属性（和visual是同一等级的，并且主要的参数是它的几何尺寸）
+      <geometry>
+        <cylinder length="0.6" radius="0.2"/>
+      </geometry>
+    </collision>
+    <inertial>			//物理属性如惯性等
+      <mass value="10"/>	//物体质量：单位kg
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>	//物体的惯量，暂时不知道其中的参数含义
+    </inertial>
+  </link>
+
+
+//gazebo显示robot的launch文件的代码解释
+
+
+<launch>
+
+  <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="paused" default="false"/>									//储存在arg中的参数，并设置默认值，帮助后面的代码运行
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="model" default="$(find urdf_tutorial)/urdf/r2d2.xacro"/>				//model的寻找路径
+
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">					//建立一个空世界的launch文件的链接
+    <arg name="debug" value="$(arg debug)" />							//这空世界里面的参数的值，借用自己定义的参数
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="headless" value="$(arg headless)"/>
+  </include>
+
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />		//当启动机器人描述的时候，命令去寻找xarco的参数
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->				//gazebo里面的输出参数
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+        args="-z 1.0 -unpause -urdf -model robot -param robot_description" respawn="false" output="screen" />
+
+  <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher">	//机器人消息发布的节点启动，并且他发布的速率是每秒30次
+    <param name="publish_frequency" type="double" value="30.0" />				
+  </node>
+
+</launch>
+
+
+
+
+//gazebo的插件（plugin）需要在urdf的代码里面添加，一般在</robot>的上面，在</joint>的下面如下面表示
+
+
+
+<joint name="tobox" type="fixed">
+    <parent link="head"/>
+    <child link="box"/>
+    <origin xyz="${.707*width+0.04} 0 ${.707*width}"/>
+</joint>								//前面是joint的相关信息
+<gazebo>								//gazebo插件信息--链接了ros和gazebo的相关信息，但这个时候还是无法控制，因为我们没有明确告诉ros一些参数，使得我们通过ros控制gazebo
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">	//打开gazebo里面的ros控制的文件
+      <robotNamespace>/</robotNamespace>					//必须添加的参数，我们不做更改
+    </plugin>								//插件结束
+</gazebo>
+
+</robot>
+
+（注意需要在launch文件里面添加一些读取参数的代码如下）
+
+<launch>
+<arg name="model" default="$(find urdf_sim_tutorial)/urdf/09-publishjoints.urdf.xacro"/>	//命名model的参数，其内容是寻找xarco的文件
+<arg name="rvizconfig" default="$(find urdf_tutorial)/rviz/urdf.rviz" />			//rvize的寻找文件的参数，用于寻找rvize的参数
+<include file="$(find urdf_sim_tutorial)/launch/gazebo.launch">					//包含打开gzebo.launch 的代码
+<arg name="model" value="$(arg model)" />
+</include>
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" />				//打开rvize的代码，并使用相关的参数，来准确找到
+<rosparam command="load"									//ros参数的读取命令，用文件里面读取默认的初始化参数，里面包含着joint控制器发布消息的类型和发布速率
+file="$(find urdf_sim_tutorial)/config/joints.yaml"
+ns="r2d2_joint_state_controller" />	//在命名空间中启动节点r2d2_joint_state_controller
+<node name="r2d2_controller_spawner" pkg="controller_manager" type="spawner"
+args="r2d2_joint_state_controller
+--shutdown-timeout 3"/>
+</launch>
+
+
+
+//当以上的gazebo启动参数，插件等，launch文件添加读取参数的代码等，我们还需要在urdf文件你面添加一些传递参数（transmission），比如在joint添加一些电机参数
+ <transmission name="head_swivel_trans">				//对传递参数命名
+    <type>transmission_interface/SimpleTransmission</type>		//传递参数的类型
+    <actuator name="$head_swivel_motor">				//电机的名字
+      <mechanicalReduction>1</mechanicalReduction>			//单击参数
+    </actuator>		
+    <joint name="head_swivel">						//插入的joint的名称
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
+
+//最后一个完整launch启动的代码如下表示（改代码可以显示gazebo的模拟和控制）
+其解释如下
+
+
+<launch>
+  <arg name="model" default="$(find urdf_sim_tutorial)/urdf/13-diffdrive.urdf.xacro"/>			//定义参数model的含义
+  <arg name="rvizconfig" default="$(find urdf_tutorial)/rviz/urdf.rviz" />				//定义rvize寻找参数的地址
+
+  <include file="$(find urdf_sim_tutorial)/launch/gazebo.launch">					//包含gazebo的launch启动文件
+    <arg name="model" value="$(arg model)" />								//gazebo里面的参数依照model的查找、因为在gazebo.launch里面没有定义model的参数，故在这里需要给出
+  </include>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" />				//启动rvize的节点，并依照参数路径来查找文件
+
+  <rosparam command="load"										//读取joints.yaml文件来控制机器人的某些关节
+            file="$(find urdf_sim_tutorial)/config/joints.yaml"
+            ns="r2d2_joint_state_controller" />								//并且命名空间为r2d2_joint_state_controller
+  <rosparam command="load"	
+            file="$(find urdf_sim_tutorial)/config/head.yaml"
+            ns="r2d2_head_controller" />
+  <rosparam command="load"
+            file="$(find urdf_sim_tutorial)/config/gripper.yaml"
+            ns="r2d2_gripper_controller" />
+  <rosparam command="load"
+            file="$(find urdf_sim_tutorial)/config/diffdrive.yaml"
+            ns="r2d2_diff_drive_controller" />
+
+  <node name="r2d2_controller_spawner" pkg="controller_manager" type="spawner"				//启动控制再生器，它的参数是刚才读取的几个参数（这代表着控制地方有两个，一个是rviz，另一个是gazebo）
+    args="r2d2_joint_state_controller
+          r2d2_head_controller
+          r2d2_gripper_controller
+          r2d2_diff_drive_controller
+          --shutdown-timeout 3"/>
+
+  <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">			//启动控制器面板。这样我们可以调节该面板，对数据进行实时传输
+    <param name="default_topic" value="/r2d2_diff_drive_controller/cmd_vel"/>
+  </node>
+</launch>
+
+
+
+
+//这里是一个完整的urdf文件代码，包括了机器人的模型，建立的link、joint，还有添加的控制，gazebo的说明代码、插入的电机等等信息
+
+<?xml version="1.0"?>
+<robot name="roscontrol" xmlns:xacro="http://ros.org/wiki/xacro">		//xarco文件的头信息
+
+  <xacro:property name="width" value="0.2" />					//xarco的宏定义
+  <xacro:property name="leglen" value="0.6" />
+  <xacro:property name="polelen" value="0.2" />
+  <xacro:property name="bodylen" value="0.6" />
+  <xacro:property name="baselen" value="0.4" />
+  <xacro:property name="wheeldiam" value="0.07" />
+  <xacro:property name="pi" value="3.1415" />
+
+  <material name="blue">							//机器人的link的颜色设定
+    <color rgba="0 0 0.8 1"/>
+  </material>
+
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+
+  <xacro:macro name="default_inertial" params="mass">				//定义默认的惯量属性
+    <inertial>
+      <mass value="${mass}" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+    </inertial>
+  </xacro:macro>
+
+  <link name="base_link">							//定义基础的link，并使用惯量代码块
+    <visual>
+      <geometry>
+        <cylinder radius="${width}" length="${bodylen}"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="${width}" length="${bodylen}"/>
+      </geometry>
+    </collision>
+    <xacro:default_inertial mass="10"/>
+  </link>
+
+  <xacro:macro name="wheel" params="prefix suffix reflect">			//轮子的巨集指令
+
+    <link name="${prefix}_${suffix}_wheel">
+      <visual>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
+        <geometry>
+          <cylinder radius="${wheeldiam/2}" length="0.1"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
+        <geometry>
+          <cylinder radius="${wheeldiam/2}" length="0.1"/>
+        </geometry>
+      </collision>
+      <xacro:default_inertial mass="1"/>
+    </link>
+    <joint name="${prefix}_${suffix}_wheel_joint" type="continuous">
+      <axis xyz="0 1 0" rpy="0 0 0" />
+      <parent link="${prefix}_base"/>
+      <child link="${prefix}_${suffix}_wheel"/>
+      <origin xyz="${baselen*reflect/3} 0 -${wheeldiam/2+.05}" rpy="0 0 0"/>
+    </joint>
+
+    <!-- This block provides the simulator (Gazebo) with information on a few additional
+    physical properties.这里类似定义gazebo和轮子转换比， See http://gazebosim.org/tutorials/?tut=ros_urdf for more-->
+    <gazebo reference="${prefix}_${suffix}_wheel">
+      <mu1 value="200.0"/>
+      <mu2 value="100.0"/>
+      <kp value="10000000.0" />
+      <kd value="1.0" />
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <!-- 这里加入了轮子电机等参数This block connects the wheel joint to an actuator (motor), which informs both
+    simulation and visualization of the robot -->
+    <transmission name="${prefix}_${suffix}_wheel_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="${prefix}_${suffix}_wheel_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+      <joint name="${prefix}_${suffix}_wheel_joint">
+        <hardwareInterface>VelocityJointInterface</hardwareInterface>
+      </joint>
+    </transmission>
+
+  </xacro:macro>
+
+  <xacro:macro name="leg" params="prefix reflect">
+    <link name="${prefix}_leg">
+      <visual>
+        <geometry>
+          <box size="${leglen} 0.1 0.2"/>
+        </geometry>
+        <origin xyz="0 0 -${leglen/2}" rpy="0 ${pi/2} 0"/>
+        <material name="white"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${leglen} 0.1 0.2"/>
+        </geometry>
+        <origin xyz="0 0 -${leglen/2}" rpy="0 ${pi/2} 0"/>
+      </collision>
+      <xacro:default_inertial mass="10"/>
+    </link>
+
+    <joint name="base_to_${prefix}_leg" type="fixed">
+      <parent link="base_link"/>
+      <child link="${prefix}_leg"/>
+      <origin xyz="0 ${reflect*(width+.02)} 0.25" />
+    </joint>
+
+    <link name="${prefix}_base">
+      <visual>
+        <geometry>
+          <box size="${baselen} 0.1 0.1"/>
+        </geometry>
+        <material name="white"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${baselen} 0.1 0.1"/>
+        </geometry>
+      </collision>
+      <xacro:default_inertial mass="10"/>
+    </link>
+
+    <joint name="${prefix}_base_joint" type="fixed">
+      <parent link="${prefix}_leg"/>
+      <child link="${prefix}_base"/>
+      <origin xyz="0 0 ${-leglen}" />
+    </joint>
+    <xacro:wheel prefix="${prefix}" suffix="front" reflect="1"/>
+    <xacro:wheel prefix="${prefix}" suffix="back" reflect="-1"/>
+  </xacro:macro>
+  <xacro:leg prefix="right" reflect="-1" />
+  <xacro:leg prefix="left" reflect="1" />
+
+  <joint name="gripper_extension" type="prismatic">
+    <parent link="base_link"/>
+    <child link="gripper_pole"/>
+    <limit effort="1000.0" lower="-${width*2-.02}" upper="0" velocity="0.5"/>
+    <origin rpy="0 0 0" xyz="${width-.01} 0 0.2"/>
+    <limit effort="30" velocity="0.2"/>
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+
+  <link name="gripper_pole">
+    <visual>
+      <geometry>
+        <cylinder length="${polelen}" radius="0.01"/>
+      </geometry>
+      <origin xyz="${polelen/2} 0 0" rpy="0 ${pi/2} 0 "/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="${polelen}" radius="0.01"/>
+      </geometry>
+      <origin xyz="${polelen/2} 0 0" rpy="0 ${pi/2} 0 "/>
+    </collision>
+    <xacro:default_inertial mass="0.05"/>
+  </link>
+
+  <transmission name="gripper_extension_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="gripper_extension_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="gripper_extension">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
+  <xacro:macro name="gripper" params="prefix reflect">
+    <joint name="${prefix}_gripper_joint" type="revolute">
+      <axis xyz="0 0 ${reflect}"/>
+      <limit effort="1000.0" lower="0.0" upper="0.548" velocity="0.5"/>
+      <origin rpy="0 0 0" xyz="${polelen} ${reflect*0.01} 0"/>
+      <parent link="gripper_pole"/>
+      <child link="${prefix}_gripper"/>
+      <limit effort="30" velocity="1.0"/>
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+    <link name="${prefix}_gripper">
+      <visual>
+        <origin rpy="${(reflect-1)/2*pi} 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://urdf_tutorial/meshes/l_finger.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <mesh filename="package://urdf_tutorial/meshes/l_finger.dae"/>
+        </geometry>
+        <origin rpy="${(reflect-1)/2*pi} 0 0" xyz="0 0 0"/>
+      </collision>
+      <xacro:default_inertial mass="0.05"/>
+    </link>
+<!--这里是有关机械手的动力源相关参数-->
+    <transmission name="${prefix}_gripper_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="${prefix}_gripper_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+      <joint name="${prefix}_gripper_joint">
+        <hardwareInterface>PositionJointInterface</hardwareInterface>
+      </joint>
+    </transmission>
+
+    <joint name="${prefix}_tip_joint" type="fixed">
+      <parent link="${prefix}_gripper"/>
+      <child link="${prefix}_tip"/>
+    </joint>
+    <link name="${prefix}_tip">
+      <visual>
+        <origin rpy="${(reflect-1)/2*pi} 0 0" xyz="0.09137 0.00495 0"/>
+        <geometry>
+          <mesh filename="package://urdf_tutorial/meshes/l_finger_tip.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <mesh filename="package://urdf_tutorial/meshes/l_finger_tip.dae"/>
+        </geometry>
+        <origin rpy="${(reflect-1)/2*pi} 0 0" xyz="0.09137 0.00495 0"/>
+      </collision>
+      <xacro:default_inertial mass="0.05"/>
+    </link>
+  </xacro:macro>
+
+  <xacro:gripper prefix="left" reflect="1" />
+  <xacro:gripper prefix="right" reflect="-1" />
+
+  <link name="head">
+    <visual>
+      <geometry>
+        <sphere radius="${width}"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="${width}"/>
+      </geometry>
+    </collision>
+    <xacro:default_inertial mass="2"/>
+  </link>
+
+  <joint name="head_swivel" type="continuous">
+    <parent link="base_link"/>
+    <child link="head"/>
+    <axis xyz="0 0 1"/>
+    <origin xyz="0 0 ${bodylen/2}"/>
+    <limit effort="30" velocity="1.0"/>
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+
+  <!-- This block connects the head_swivel joint to an actuator (motor), which informs both
+  simulation and visualization of the robot -->
+  <transmission name="head_swivel_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="$head_swivel_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="head_swivel">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
+  <link name="box">
+    <visual>
+      <geometry>
+        <box size="0.08 0.08 0.08"/>
+      </geometry>
+      <material name="blue"/>
+      <origin xyz="-0.04 0 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.08 0.08 0.08"/>
+      </geometry>
+    </collision>
+    <xacro:default_inertial mass="1"/>
+  </link>
+
+  <joint name="tobox" type="fixed">
+    <parent link="head"/>
+    <child link="box"/>
+    <origin xyz="${.707*width+0.04} 0 ${.707*width}"/>
+  </joint>
+
+  <!-- Gazebo plugin for ROS Control -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/</robotNamespace>
+    </plugin>
+  </gazebo>
+
+</robot>

@@ -1,0 +1,36 @@
+ctrl+shift+c    ctrl+shift+v 终端的复制、粘贴
+sudo  nautilus    可以出现超级用户文件夹，可以编辑任何文件
+ls -a  显示所有文件夹（包括隐藏文件）
+ls -1(数字1)将文件夹显示成1列
+开启新终端
+ctrl+shift+t
+关闭终端
+ctrl+d  （必须是该终端没有任何进程在执行）
+ctrl+shift+q (无论是否为最后一个，也不论是否有进程执行)
+
+export  将已设置的变量进行输出
+grep  将搜索到的文本进行正则输出
+	例子：export|grep ROS 可以将当前设置的ROS变量正则输出出来
+Tab   可以补全命令
+mkdir + 文件夹   创建新的文件夹
+rm -rf   删除文件夹   r是表示向下递归，所有子目录全部删除，f是强行
+
+ctrl + alt +t 开启终端    ctrl+shift+t 开启终端新标签
+
+sudo apt-get purge  卸载软件
+ps aux | grap +名称  查看锁的vsz   sudo kill +vsz  关闭锁
+
+dpkg -l | grep  + 软件的名称     查看该软件安装的所有内容
+
+
+各自不同的注释    xml文件的注释<!-- 注释信息    -->
+									launch文件的注释  <!-- 注释信息    -->
+									yaml文件的注释    # 注释信息
+									
+									
+在github上克隆文件    git clone + github网址
+
+sudo apt-get install liburdfdom-tools 安装urdf语法检查器
+check_urdf xxx.urdf 检查语法
+
+～表示/home/weki(用户名)
