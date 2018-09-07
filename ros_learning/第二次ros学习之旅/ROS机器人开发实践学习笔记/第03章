@@ -1,0 +1,5 @@
+1. 	配置ros的IDE(eclipse)时的流程：
+		1)  首先，eclipse需要java环境(eclipse是由java编写的)，故我们需要在java官网下载linux版本的jdk或者jre，进行安装，详细情况见博客https://blog.csdn.net/astroskyi/article/details/81055616   ,安装完成后重启电脑，然后终端输入java -version查看是否显示版本信息，如果有则安装成功;
+		2)	下载eclipse，然后安装ros机器人开发实践p30来操作，注意，该书有两点有问题，首先如果需要调试，我们需要先cd ~/catkin_ws/devel 然后在执行cmake ../src -DCMAKE_BULID_TYPE=DEBUG的版本 
+				其次，我们不用设置头文件路径，我们只需要确保properties中c/c++ include paths and symbols 的里面含有ros路径，并且正确即可（这是新版本的特性），设置详情也可参考http://wiki.ros.org/IDEs
+				可以在~/.bashrc 添加 bash -i -c "eclipse"的快捷方式启动eclipse,这样启动是为了eclipse启动时加载.bashrc环境(注意要在前面加上eclisp的路径，例如我的是export PATH=$PATH:$HOME/eclipse2/eclipse)

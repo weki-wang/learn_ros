@@ -1,0 +1,12 @@
+1.  	下载源码过程中，出现一个报错，没有ecto包
+			解决办法：sudo apt-get install ros-indigo-ecto-* 安装ecto
+			
+			
+2.		在编译过程会遇到一些错误，即缺少一些依赖包，这些可以查看报错信息，然后在wiki上寻找这些包，然后编译。
+			注：编译过程依旧遇到连很多问题，无法解决，但发现在编译之前，我们需要执行源代码ros_exploring里面的ros_exploring_prereq.sh,具体的命令行为：
+			cd ~/catkin_ws/src/ros_exploring   具体的路径看自己放置ros_exploring在那个文件夹
+			./ros_exploring_prereq.sh    会执行里面安装的程序
+			
+			但是，在编译ros_voice 和 dynamic_tutorials 总会出问题
+			
+		
